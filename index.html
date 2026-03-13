@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spirograph</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #111;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    /* ---- left panel: canvas ---- */
+    #canvas-container {
+      flex: 1 1 auto;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    #canvas-container canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* ---- right sidebar ---- */
+    #sidebar {
+      flex: 0 0 200px;
+      display: flex;
+      flex-direction: column;
+      background: #1a1a1a;
+      border-left: 1px solid #333;
+    }
+
+    /* nav buttons */
+    #nav {
+      padding: 16px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-bottom: 1px solid #333;
+    }
+
+    #nav button {
+      padding: 10px;
+      background: #2a2a2a;
+      color: #ccc;
+      border: 1px solid #444;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    #nav button:hover { background: #3a3a3a; color: #fff; }
+
+    #nav button.active {
+      background: #4a3a7a;
+      color: #fff;
+      border-color: #7a6aaa;
+    }
+
+    /* gallery panel */
+    #gallery-panel {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #gallery-header {
+      padding: 10px 12px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    #gallery-label {
+      color: #888;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* upload button */
+    #upload-btn {
+      background: none;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #aaa;
+      font-size: 11px;
+      padding: 3px 7px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    #upload-btn:hover { background: #2a2a2a; color: #fff; }
+
+    #file-input { display: none; }
+
+    /* drop zone — shown when dragging a file over the window */
+    #drop-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(80, 50, 140, 0.45);
+      border: 3px dashed #aa88ff;
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      pointer-events: none;
+    }
+    #drop-overlay.active { display: flex; }
+
+    /* upload progress bar */
+    #upload-progress {
+      height: 3px;
+      background: #4a3a7a;
+      width: 0;
+      transition: width 0.2s;
+    }
+
+    #gallery-thumbs {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .gallery-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .gallery-thumb:hover   { border-color: #7a6aaa; }
+    .gallery-thumb.selected { border-color: #aa88ff; }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container"></div>
+
+  <div id="sidebar">
+    <div id="nav">
+      <button id="btn-spiro" class="active" onclick="switchMode('spiro')">Spirograph</button>
+      <button id="btn-reveal"              onclick="switchMode('reveal')">Reveal</button>
+      <button id="btn-kali"               onclick="switchMode('kali')">Kaleidoscope</button>
+    </div>
+
+    <div id="gallery-panel">
+      <div id="gallery-header">
+        <span id="gallery-label">Images</span>
+        <button id="upload-btn" onclick="document.getElementById('file-input').click()">+ Upload</button>
+        <input id="file-input" type="file" accept="image/*" multiple onchange="handleFileInput(this.files)">
+      </div>
+      <div id="upload-progress"></div>
+      <div id="gallery-thumbs"></div>
+    </div>
+  </div>
+
+  <!-- drag-and-drop overlay (whole window) -->
+  <div id="drop-overlay">Drop image to add</div>
+
+  <script src="spiro_core.js"></script>
+  <script src="sketch_spiro.js"></script>
+  <script src="sketch_reveal.js"></script>
+  <script src="sketch_kali.js"></script>
+
+  <script>
+    // -----------------------------------------------------------------------
+    // Mode management
+    // -----------------------------------------------------------------------
+    let currentMode   = null;
+    let currentSketch = null;
+
+    const SKETCHES = { spiro: spiroSketch, reveal: revealSketch, kali: kaliSketch };
+
+    function switchMode(mode) {
+      if (mode === currentMode) return;
+      if (currentSketch) { currentSketch.remove(); currentSketch = null; }
+
+      document.getElementById('canvas-container').innerHTML = '';
+      document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + mode).classList.add('active');
+
+      currentMode   = mode;
+      currentSketch = new p5(SKETCHES[mode], document.getElementById('canvas-container'));
+
+      const imageMode = (mode === 'reveal' || mode === 'kali');
+      if (imageMode && selectedImage) {
+        setTimeout(() => currentSketch.setImage(selectedImage), 50);
+      }
+
+      document.getElementById('gallery-panel').style.display =
+        imageMode ? 'flex' : 'none';
+    }
+
+    // -----------------------------------------------------------------------
+    // Gallery
+    // -----------------------------------------------------------------------
+    let selectedImage = null;
+
+    function addThumb(filename, selectIt) {
+      const thumbs = document.getElementById('gallery-thumbs');
+      const img = document.createElement('img');
+      img.src       = filename;
+      img.title     = filename;
+      img.className = 'gallery-thumb';
+      img.onclick   = () => selectImage(filename, img);
+      thumbs.appendChild(img);
+      if (selectIt) selectImage(filename, img);
+      return img;
+    }
+
+    function selectImage(path, thumbEl) {
+      selectedImage = path;
+      document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('selected'));
+      thumbEl.classList.add('selected');
+      if ((currentMode === 'reveal' || currentMode === 'kali') && currentSketch) {
+        currentSketch.setImage(path);
+      }
+    }
+
+    // Load image list from server
+    async function loadGallery() {
+      try {
+        const res  = await fetch('api/images');
+        const list = await res.json();
+        list.forEach((f, i) => addThumb(f, i === 0));
+      } catch (e) {
+        // Offline / static file server — seed with KJ.png if present
+        addThumb('KJ.png', true);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Upload
+    // -----------------------------------------------------------------------
+    async function uploadFiles(files) {
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+
+        setProgress(30);
+        let path = null;
+        try {
+          const form = new FormData();
+          form.append('file', file);
+          const res  = await fetch('api/upload', { method: 'POST', body: form });
+          if (res.ok) {
+            const data = await res.json();
+            path = data.filename || null;
+          }
+        } catch (e) {
+          // Server not available — fall through to local object URL
+        }
+
+        // Fallback: show image locally via object URL (not persisted to server)
+        if (!path) path = URL.createObjectURL(file);
+
+        setProgress(100);
+        addThumb(path, true);
+        setTimeout(() => setProgress(0), 600);
+      }
+    }
+
+    function handleFileInput(files) { uploadFiles(files); }
+
+    function setProgress(pct) {
+      document.getElementById('upload-progress').style.width = pct + '%';
+    }
+
+    // -----------------------------------------------------------------------
+    // Drag-and-drop (anywhere on the page)
+    // -----------------------------------------------------------------------
+    let dragCounter = 0;
+
+    document.addEventListener('dragenter', e => {
+      if ([...e.dataTransfer.types].includes('Files')) {
+        dragCounter++;
+        document.getElementById('drop-overlay').classList.add('active');
+      }
+    });
+
+    document.addEventListener('dragleave', () => {
+      if (--dragCounter <= 0) {
+        dragCounter = 0;
+        document.getElementById('drop-overlay').classList.remove('active');
+      }
+    });
+
+    document.addEventListener('dragover', e => e.preventDefault());
+
+    document.addEventListener('drop', e => {
+      e.preventDefault();
+      dragCounter = 0;
+      document.getElementById('drop-overlay').classList.remove('active');
+      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+    });
+
+    // -----------------------------------------------------------------------
+    // Boot
+    // -----------------------------------------------------------------------
+    document.getElementById('gallery-panel').style.display = 'none';
+    loadGallery();
+    switchMode('spiro');
+  </script>
+</body>
+</html>

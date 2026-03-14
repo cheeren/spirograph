@@ -16,7 +16,7 @@
       font-family: sans-serif;
     }
 
-    /* ---- left panel: canvas ---- */
+    /* ── Canvas ── */
     #canvas-container {
       flex: 1 1 auto;
       overflow: hidden;
@@ -25,90 +25,179 @@
       justify-content: center;
       background: #000;
     }
+    #canvas-container canvas { display: block; max-width: 100%; max-height: 100%; }
 
-    #canvas-container canvas {
-      display: block;
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    /* ---- right sidebar ---- */
+    /* ── Sidebar ── */
     #sidebar {
-      flex: 0 0 200px;
+      flex: 0 0 210px;
       display: flex;
       flex-direction: column;
-      background: #1a1a1a;
-      border-left: 1px solid #333;
+      background: #181818;
+      border-left: 1px solid #2a2a2a;
+      overflow: hidden;
     }
 
-    /* nav buttons */
-    #nav {
-      padding: 16px 12px 12px;
+    /* ── Accordion sections ── */
+    .app-section { border-bottom: 1px solid #2a2a2a; }
+
+    .app-header {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-bottom: 1px solid #333;
-    }
-
-    #nav button {
-      padding: 10px;
-      background: #2a2a2a;
-      color: #ccc;
-      border: 1px solid #444;
-      border-radius: 6px;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 12px;
       cursor: pointer;
-      font-size: 14px;
-      transition: background 0.15s, color 0.15s;
+      color: #999;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .app-header:hover { background: #222; color: #ddd; }
+
+    .app-section.active > .app-header {
+      background: #2a1a4a;
+      color: #cc99ff;
     }
 
-    #nav button:hover { background: #3a3a3a; color: #fff; }
+    .app-arrow {
+      font-size: 9px;
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    .app-section.active > .app-header .app-arrow { transform: rotate(90deg); }
 
-    #nav button.active {
-      background: #4a3a7a;
-      color: #fff;
-      border-color: #7a6aaa;
+    /* Body is hidden unless section is active */
+    .app-body { display: none; flex-direction: column; }
+    .app-section.active > .app-body { display: flex; }
+
+    /* ── Sub-nav (within a section) ── */
+    .sub-nav {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #222;
+    }
+    .sub-btn {
+      flex: 1;
+      padding: 6px 4px;
+      background: #242424;
+      color: #999;
+      border: 1px solid #383838;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .sub-btn:hover { background: #2e2e2e; color: #eee; }
+    .sub-btn.active { background: #3a2a5a; color: #cc99ff; border-color: #6a5a9a; }
+
+    /* ── Section label ── */
+    .ctrl-label {
+      padding: 7px 12px 3px;
+      color: #666;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
-    /* gallery panel */
+    /* ── Button grid (group / motion) ── */
+    .btn-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 0 10px 8px;
+    }
+    .btn-grid button {
+      flex: 1 1 auto;
+      padding: 5px 3px;
+      background: #222;
+      color: #999;
+      border: 1px solid #383838;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+    }
+    .btn-grid button:hover { background: #2a2a2a; color: #eee; }
+    .btn-grid button.active { background: #3a2a5a; color: #cc99ff; border-color: #6a5a9a; }
+
+    /* Trace hint */
+    .trace-hint {
+      display: none;
+      margin: 0 10px 8px;
+      padding: 5px 8px;
+      background: #1e1800;
+      border-radius: 4px;
+      color: #c8a030;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    /* ── Gallery (shared, lives inside the sidebar below sections) ── */
     #gallery-panel {
       flex: 1 1 auto;
-      overflow-y: auto;
-      display: flex;
+      min-height: 0;
+      display: none;          /* shown via JS when mode needs images */
       flex-direction: column;
-      gap: 0;
+      border-top: 1px solid #2a2a2a;
     }
 
     #gallery-header {
-      padding: 10px 12px 6px;
+      padding: 8px 10px 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #2a2a2a;
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
     }
+    #gallery-label { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
 
-    #gallery-label {
-      color: #888;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    /* upload button */
     #upload-btn {
       background: none;
       border: 1px solid #444;
       border-radius: 4px;
-      color: #aaa;
+      color: #999;
       font-size: 11px;
       padding: 3px 7px;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.12s, color 0.12s;
     }
     #upload-btn:hover { background: #2a2a2a; color: #fff; }
-
     #file-input { display: none; }
 
-    /* drop zone — shown when dragging a file over the window */
+    #upload-progress {
+      height: 2px;
+      background: #5a3a9a;
+      width: 0;
+      transition: width 0.2s;
+      flex-shrink: 0;
+    }
+
+    #gallery-thumbs {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .gallery-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.12s;
+    }
+    .gallery-thumb:hover    { border-color: #7a6aaa; }
+    .gallery-thumb.selected { border-color: #aa88ff; }
+
+    /* ── Drop overlay ── */
     #drop-overlay {
       display: none;
       position: fixed;
@@ -123,204 +212,220 @@
       pointer-events: none;
     }
     #drop-overlay.active { display: flex; }
-
-    /* upload progress bar */
-    #upload-progress {
-      height: 3px;
-      background: #4a3a7a;
-      width: 0;
-      transition: width 0.2s;
-    }
-
-    #gallery-thumbs {
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow-y: auto;
-    }
-
-    .gallery-thumb {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      border-radius: 4px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.15s;
-    }
-
-    .gallery-thumb:hover   { border-color: #7a6aaa; }
-    .gallery-thumb.selected { border-color: #aa88ff; }
   </style>
 </head>
 <body>
 
-  <div id="canvas-container"></div>
+<div id="canvas-container"></div>
 
-  <div id="sidebar">
-    <div id="nav">
-      <button id="btn-spiro" class="active" onclick="switchMode('spiro')">Spirograph</button>
-      <button id="btn-reveal"              onclick="switchMode('reveal')">Reveal</button>
-      <button id="btn-kali"               onclick="switchMode('kali')">Kaleidoscope</button>
+<div id="sidebar">
+
+  <!-- ── Spirograph ── -->
+  <div class="app-section active" id="app-spiro">
+    <div class="app-header" onclick="activateApp('app-spiro', 'spiro')">
+      <span class="app-arrow">▸</span> Spirograph
     </div>
-
-    <div id="gallery-panel">
-      <div id="gallery-header">
-        <span id="gallery-label">Images</span>
-        <button id="upload-btn" onclick="document.getElementById('file-input').click()">+ Upload</button>
-        <input id="file-input" type="file" accept="image/*" multiple onchange="handleFileInput(this.files)">
+    <div class="app-body">
+      <div class="sub-nav">
+        <button class="sub-btn active" id="sub-draw"   onclick="switchMode('spiro')">Draw</button>
+        <button class="sub-btn"        id="sub-reveal" onclick="switchMode('reveal')">Reveal</button>
       </div>
-      <div id="upload-progress"></div>
-      <div id="gallery-thumbs"></div>
     </div>
   </div>
 
-  <!-- drag-and-drop overlay (whole window) -->
-  <div id="drop-overlay">Drop image to add</div>
+  <!-- ── Kaleidoscope ── -->
+  <div class="app-section" id="app-kali">
+    <div class="app-header" onclick="activateApp('app-kali', 'kali')">
+      <span class="app-arrow">▸</span> Kaleidoscope
+    </div>
+    <div class="app-body">
+      <div class="ctrl-label">Symmetry Group</div>
+      <div class="btn-grid" id="group-btns">
+        <button onclick="setKaliGroup('p3',   this)">p3</button>
+        <button onclick="setKaliGroup('p3m1', this)">p3m1</button>
+        <button onclick="setKaliGroup('p4',   this)">p4</button>
+        <button onclick="setKaliGroup('p4m',  this)">p4m</button>
+        <button onclick="setKaliGroup('p6',   this)">p6</button>
+        <button onclick="setKaliGroup('p6m',  this)" class="active">p6m</button>
+      </div>
+      <div class="ctrl-label">Motion</div>
+      <div class="btn-grid" id="motion-btns">
+        <button onclick="setKaliMotion('rotate', this)" class="active">Rotate</button>
+        <button onclick="setKaliMotion('float',  this)">Float</button>
+        <button onclick="setKaliMotion('trace',  this)">Trace</button>
+      </div>
+      <div class="trace-hint" id="trace-hint">
+        Hold + drag on canvas to record a path, release to loop.
+      </div>
+    </div>
+  </div>
 
-  <script src="spiro_core.js"></script>
-  <script src="sketch_spiro.js"></script>
-  <script src="sketch_reveal.js"></script>
-  <script src="sketch_kali.js"></script>
+  <!-- ── (future apps go here as more .app-section blocks) ── -->
 
-  <script>
-    // -----------------------------------------------------------------------
-    // Mode management
-    // -----------------------------------------------------------------------
-    let currentMode   = null;
-    let currentSketch = null;
+  <!-- ── Shared image gallery — shown when the active mode uses images ── -->
+  <div id="gallery-panel">
+    <div id="gallery-header">
+      <span id="gallery-label">Images</span>
+      <button id="upload-btn" onclick="document.getElementById('file-input').click()">+ Upload</button>
+      <input id="file-input" type="file" accept="image/*" multiple onchange="handleFileInput(this.files)">
+    </div>
+    <div id="upload-progress"></div>
+    <div id="gallery-thumbs"></div>
+  </div>
 
-    const SKETCHES = { spiro: spiroSketch, reveal: revealSketch, kali: kaliSketch };
+</div><!-- #sidebar -->
 
-    function switchMode(mode) {
-      if (mode === currentMode) return;
-      if (currentSketch) { currentSketch.remove(); currentSketch = null; }
+<div id="drop-overlay">Drop image to add</div>
 
-      document.getElementById('canvas-container').innerHTML = '';
-      document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-' + mode).classList.add('active');
+<script src="spiro_core.js"></script>
+<script src="sketch_spiro.js"></script>
+<script src="sketch_reveal.js"></script>
+<script src="sketch_kali.js"></script>
 
-      currentMode   = mode;
-      currentSketch = new p5(SKETCHES[mode], document.getElementById('canvas-container'));
+<script>
+  // ── Sketch registry ────────────────────────────────────────────────────
+  // To add a new app: (1) add .app-section HTML above,
+  // (2) add its sketch function here, (3) add it to NEEDS_IMAGES if relevant.
+  const SKETCHES    = { spiro: spiroSketch, reveal: revealSketch, kali: kaliSketch };
+  const NEEDS_IMAGE = new Set(['reveal', 'kali']);
 
-      const imageMode = (mode === 'reveal' || mode === 'kali');
-      if (imageMode && selectedImage) {
-        setTimeout(() => currentSketch.setImage(selectedImage), 50);
-      }
+  let currentMode   = null;
+  let currentSketch = null;
 
-      document.getElementById('gallery-panel').style.display =
-        imageMode ? 'flex' : 'none';
+  // ── Accordion ──────────────────────────────────────────────────────────
+  // Each app section remembers its last active sub-mode.
+  const appLastMode = { 'app-spiro': 'spiro', 'app-kali': 'kali' };
+
+  function activateApp(sectionId, defaultMode) {
+    document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    switchMode(appLastMode[sectionId] || defaultMode);
+  }
+
+  // ── Mode switching ─────────────────────────────────────────────────────
+  function switchMode(mode) {
+    if (mode === currentMode) return;
+    if (currentSketch) { currentSketch.remove(); currentSketch = null; }
+
+    document.getElementById('canvas-container').innerHTML = '';
+    currentMode   = mode;
+    currentSketch = new p5(SKETCHES[mode], document.getElementById('canvas-container'));
+
+    // Remember sub-mode for the relevant section
+    if (mode === 'spiro' || mode === 'reveal') appLastMode['app-spiro'] = mode;
+    if (mode === 'kali')                       appLastMode['app-kali']  = mode;
+
+    // Update Spirograph sub-nav
+    document.getElementById('sub-draw')  .classList.toggle('active', mode === 'spiro');
+    document.getElementById('sub-reveal').classList.toggle('active', mode === 'reveal');
+
+    // Push selected image to sketch if switching to an image mode
+    if (NEEDS_IMAGE.has(mode) && selectedImage) {
+      setTimeout(() => currentSketch.setImage(selectedImage), 50);
     }
 
-    // -----------------------------------------------------------------------
-    // Gallery
-    // -----------------------------------------------------------------------
-    let selectedImage = null;
+    // Show gallery for image modes
+    document.getElementById('gallery-panel').style.display =
+      NEEDS_IMAGE.has(mode) ? 'flex' : 'none';
+  }
 
-    function addThumb(filename, selectIt) {
-      const thumbs = document.getElementById('gallery-thumbs');
-      const img = document.createElement('img');
-      img.src       = filename;
-      img.title     = filename;
-      img.className = 'gallery-thumb';
-      img.onclick   = () => selectImage(filename, img);
-      thumbs.appendChild(img);
-      if (selectIt) selectImage(filename, img);
-      return img;
+  // ── Kali controls ──────────────────────────────────────────────────────
+  function setKaliGroup(key, btn) {
+    document.querySelectorAll('#group-btns button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (currentSketch && currentSketch.setGroup) currentSketch.setGroup(key);
+  }
+
+  function setKaliMotion(mode, btn) {
+    document.querySelectorAll('#motion-btns button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('trace-hint').style.display =
+      mode === 'trace' ? 'block' : 'none';
+    if (currentSketch && currentSketch.setMotion) currentSketch.setMotion(mode);
+  }
+
+  // ── Gallery ────────────────────────────────────────────────────────────
+  let selectedImage = null;
+
+  function addThumb(filename, selectIt) {
+    const thumbs = document.getElementById('gallery-thumbs');
+    const img    = document.createElement('img');
+    img.src       = filename;
+    img.title     = filename;
+    img.className = 'gallery-thumb';
+    img.onclick   = () => selectImage(filename, img);
+    thumbs.appendChild(img);
+    if (selectIt) selectImage(filename, img);
+    return img;
+  }
+
+  function selectImage(path, thumbEl) {
+    selectedImage = path;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('selected'));
+    thumbEl.classList.add('selected');
+    if (NEEDS_IMAGE.has(currentMode) && currentSketch)
+      currentSketch.setImage(path);
+  }
+
+  async function loadGallery() {
+    try {
+      const res  = await fetch('api/images');
+      const list = await res.json();
+      list.forEach((f, i) => addThumb(f, i === 0));
+    } catch (e) {
+      addThumb('KJ.png', true);
     }
+  }
 
-    function selectImage(path, thumbEl) {
-      selectedImage = path;
-      document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('selected'));
-      thumbEl.classList.add('selected');
-      if ((currentMode === 'reveal' || currentMode === 'kali') && currentSketch) {
-        currentSketch.setImage(path);
-      }
-    }
-
-    // Load image list from server
-    async function loadGallery() {
+  // ── Upload ─────────────────────────────────────────────────────────────
+  async function uploadFiles(files) {
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) continue;
+      setProgress(30);
+      let path = null;
       try {
-        const res  = await fetch('api/images');
-        const list = await res.json();
-        list.forEach((f, i) => addThumb(f, i === 0));
-      } catch (e) {
-        // Offline / static file server — seed with KJ.png if present
-        addThumb('KJ.png', true);
-      }
+        const form = new FormData();
+        form.append('file', file);
+        const res  = await fetch('api/upload', { method: 'POST', body: form });
+        if (res.ok) { const d = await res.json(); path = d.filename || null; }
+      } catch (e) { /* fall through */ }
+      if (!path) path = URL.createObjectURL(file);
+      setProgress(100);
+      addThumb(path, true);
+      setTimeout(() => setProgress(0), 600);
     }
+  }
 
-    // -----------------------------------------------------------------------
-    // Upload
-    // -----------------------------------------------------------------------
-    async function uploadFiles(files) {
-      for (const file of files) {
-        if (!file.type.startsWith('image/')) continue;
+  function handleFileInput(files) { uploadFiles(files); }
+  function setProgress(pct) {
+    document.getElementById('upload-progress').style.width = pct + '%';
+  }
 
-        setProgress(30);
-        let path = null;
-        try {
-          const form = new FormData();
-          form.append('file', file);
-          const res  = await fetch('api/upload', { method: 'POST', body: form });
-          if (res.ok) {
-            const data = await res.json();
-            path = data.filename || null;
-          }
-        } catch (e) {
-          // Server not available — fall through to local object URL
-        }
-
-        // Fallback: show image locally via object URL (not persisted to server)
-        if (!path) path = URL.createObjectURL(file);
-
-        setProgress(100);
-        addThumb(path, true);
-        setTimeout(() => setProgress(0), 600);
-      }
-    }
-
-    function handleFileInput(files) { uploadFiles(files); }
-
-    function setProgress(pct) {
-      document.getElementById('upload-progress').style.width = pct + '%';
-    }
-
-    // -----------------------------------------------------------------------
-    // Drag-and-drop (anywhere on the page)
-    // -----------------------------------------------------------------------
-    let dragCounter = 0;
-
-    document.addEventListener('dragenter', e => {
-      if ([...e.dataTransfer.types].includes('Files')) {
-        dragCounter++;
+  // ── Drag-and-drop ──────────────────────────────────────────────────────
+  let dragCounter = 0;
+  document.addEventListener('dragenter', e => {
+    if ([...e.dataTransfer.types].includes('Files')) {
+      if (++dragCounter === 1)
         document.getElementById('drop-overlay').classList.add('active');
-      }
-    });
-
-    document.addEventListener('dragleave', () => {
-      if (--dragCounter <= 0) {
-        dragCounter = 0;
-        document.getElementById('drop-overlay').classList.remove('active');
-      }
-    });
-
-    document.addEventListener('dragover', e => e.preventDefault());
-
-    document.addEventListener('drop', e => {
-      e.preventDefault();
+    }
+  });
+  document.addEventListener('dragleave', () => {
+    if (--dragCounter <= 0) {
       dragCounter = 0;
       document.getElementById('drop-overlay').classList.remove('active');
-      if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
-    });
+    }
+  });
+  document.addEventListener('dragover',  e => e.preventDefault());
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    dragCounter = 0;
+    document.getElementById('drop-overlay').classList.remove('active');
+    if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files);
+  });
 
-    // -----------------------------------------------------------------------
-    // Boot
-    // -----------------------------------------------------------------------
-    document.getElementById('gallery-panel').style.display = 'none';
-    loadGallery();
-    switchMode('spiro');
-  </script>
+  // ── Boot ───────────────────────────────────────────────────────────────
+  loadGallery();
+  switchMode('spiro');
+</script>
 </body>
 </html>

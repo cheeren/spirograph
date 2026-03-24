@@ -243,7 +243,8 @@
       <div class="btn-grid" id="group-btns">
         <button onclick="setKaliGroup('p3',   this)">p3</button>
         <button onclick="setKaliGroup('p3m1', this)">p3m1</button>
-        <button onclick="setKaliGroup('p4',   this)">p4</button>
+        <button onclick="setKaliGroup('p31m', this)">p31m</button>
+        <button onclick="setKaliGroup('p4g',  this)">p4g</button>
         <button onclick="setKaliGroup('p4m',  this)">p4m</button>
         <button onclick="setKaliGroup('p6',   this)">p6</button>
         <button onclick="setKaliGroup('p6m',  this)" class="active">p6m</button>
@@ -252,10 +253,6 @@
       <div class="btn-grid" id="motion-btns">
         <button onclick="setKaliMotion('rotate', this)" class="active">Rotate</button>
         <button onclick="setKaliMotion('float',  this)">Float</button>
-        <button onclick="setKaliMotion('trace',  this)">Trace</button>
-      </div>
-      <div class="trace-hint" id="trace-hint">
-        Hold + drag on canvas to record a path, release to loop.
       </div>
     </div>
   </div>
@@ -339,8 +336,6 @@
   function setKaliMotion(mode, btn) {
     document.querySelectorAll('#motion-btns button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('trace-hint').style.display =
-      mode === 'trace' ? 'block' : 'none';
     if (currentSketch && currentSketch.setMotion) currentSketch.setMotion(mode);
   }
 
